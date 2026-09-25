@@ -1,0 +1,198 @@
+/* ============================================================
+   RELATÓRIO DE VISITAS — VERSÃO 2 (identidade nova, 25/09/2026)
+   Camada carregada DEPOIS de estilo.css: só sobrescreve o visual.
+   Estrutura, dados e scripts são os mesmos da v1 (cópia integral em
+   _versões anteriores/Site v1). Para voltar à v1, basta remover o
+   <link> deste arquivo das seis páginas.
+   Identidade: Manual de Identidade Visual — 28ª Região (eixo VIA).
+   ============================================================ */
+
+:root{
+  --vinho-emblema:#7A1618;
+  --ouro-grad:linear-gradient(180deg,#F6E7B0 0%,#E0BC62 38%,#C9A24B 60%,#9A7322 100%);
+  --faixa-ouro:linear-gradient(90deg,#8C6A1F 0%,#C9A24B 20%,#F4E3A8 50%,#C9A24B 80%,#8C6A1F 100%);
+  --corpo:'Inter',system-ui,sans-serif;
+  --script:'Great Vibes',cursive;
+  --cartao:linear-gradient(180deg,rgba(22,67,47,.55),rgba(8,30,21,.75));
+  --borda-ouro:rgba(201,162,75,.55);
+}
+
+body{font-size:16px; line-height:1.65; color:rgba(246,241,228,.82);}
+/* Fundo dos posts: losangos tom sobre tom + brilho verde */
+body::before{
+  opacity:1;
+  background:
+    radial-gradient(60% 45% at 50% 0%, rgba(52,138,98,.30), transparent 70%),
+    radial-gradient(50% 40% at 90% 80%, rgba(31,96,72,.22), transparent 72%),
+    linear-gradient(135deg, rgba(255,255,255,.035) 0 1px, transparent 1px) 0 0/120px 120px,
+    linear-gradient(45deg, rgba(255,255,255,.035) 0 1px, transparent 1px) 0 0/120px 120px;
+}
+
+/* ── Moldura: filete dourado embaixo, marca com peso ── */
+.moldura{background:rgba(9,32,23,.9); border-bottom:0;}
+.moldura::after{content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--faixa-ouro);}
+.brasao .emblema{width:40px; height:40px;}
+.brasao span{font-weight:700; color:#fff;}
+.capitulos a{font-weight:600; opacity:.75;}
+
+/* ── Cabeçalho de capítulo ── */
+.capitulo-num{font-family:var(--corpo); font-weight:800; font-size:12px; letter-spacing:.34em;}
+.capitulo-num::after{height:2px; background:linear-gradient(90deg,var(--dourado),transparent);}
+.titulo-capitulo{font-weight:900; color:#fff; letter-spacing:.02em; text-shadow:0 8px 30px rgba(0,0,0,.35);}
+.subtitulo-capitulo{font-weight:400; color:var(--champanhe);}
+.titulo-capitulo::before{
+  content:attr(data-script); display:block; font-family:var(--script); text-transform:none;
+  font-weight:400; letter-spacing:0; font-size:.62em; line-height:1; color:#E6C97A; margin-bottom:.06em;
+}
+.titulo-capitulo:not([data-script])::before{display:none;}
+
+/* ── 01 · Abertura ── */
+#abertura{padding-top:calc(var(--barra) + 30px); padding-bottom:60px;}
+#abertura{overflow:visible;}
+#abertura > .mosaico{position:absolute; top:0; bottom:0; left:50%; width:100vw; transform:translateX(-50%); z-index:0; display:grid; overflow:hidden;
+  grid-template-columns:repeat(6,1fr); grid-auto-rows:1fr; opacity:.16; filter:grayscale(.3);}
+.mosaico img{width:100%; height:100%; object-fit:cover; display:block;}
+.mosaico::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(60% 60% at 50% 45%, rgba(14,46,34,.55), rgba(8,26,18,.96) 80%);}
+#abertura .marca-dagua{display:none;}
+#abertura .emblema-capa{width:clamp(150px,20vh,230px); height:auto; margin:0 auto 6px; display:block;
+  filter:drop-shadow(0 18px 34px rgba(0,0,0,.6));}
+/* Igual às capas oficiais: manuscrito Great Vibes dourado encostando no título Inter 900 branco. */
+.titulo-capa{margin:6px 0 0; line-height:1;}
+.titulo-capa .sc{display:block; position:relative; z-index:2; font-family:var(--script); font-weight:400;
+  font-size:clamp(52px,6.4vw,88px); color:#D7B35C; line-height:1; margin-bottom:-.3em;
+  text-shadow:0 4px 14px rgba(0,0,0,.45);}
+.titulo-capa .gd{display:block; position:relative; z-index:1; font-family:var(--corpo); font-weight:900;
+  font-size:clamp(70px,11vw,150px); line-height:.9; letter-spacing:-.01em; text-transform:uppercase; color:#fff;
+  text-shadow:0 8px 30px rgba(0,0,0,.4);}
+#abertura .gabinete{margin-top:18px; line-height:2; letter-spacing:.34em; font-weight:600;}
+#abertura .gabinete-regiao{display:inline; font-size:inherit; letter-spacing:inherit; color:#fff; margin:0;}
+#abertura .gabinete b{display:inline;}
+#abertura .gabinete b::before{content:" · ";}
+#abertura .selo-fino{display:none;}
+.km-quadro{display:inline-flex; flex-direction:column; align-items:center; margin:26px auto 0;
+  padding:18px 46px 16px; border:2px solid var(--borda-ouro); border-radius:14px;
+  background:linear-gradient(180deg,rgba(8,30,21,.65),rgba(6,22,15,.85)); box-shadow:0 18px 40px rgba(0,0,0,.4);}
+#abertura .numeral{font-weight:900; font-size:clamp(54px,8vw,104px);
+  background:var(--ouro-grad); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:none;}
+#abertura .unidade{margin-top:8px; font-family:var(--corpo); font-weight:700; letter-spacing:.34em; color:#fff;}
+#abertura .epigrafe{margin-top:26px; font-size:clamp(18px,2.2vw,23px); color:var(--champanhe);}
+#abertura .desca{margin-top:28px; font-family:var(--corpo); font-weight:700;}
+
+/* ── 02 · Números em cartões ── */
+.painel{gap:18px;}
+.indicador{position:relative; padding:28px 24px 22px; border:1px solid var(--borda-ouro); border-radius:14px;
+  background:var(--cartao); box-shadow:0 14px 34px rgba(0,0,0,.35); overflow:hidden;}
+.indicador::before{content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--faixa-ouro);}
+.indicador .ico{width:34px; height:34px; color:var(--dourado); display:block; margin-bottom:14px;}
+.indicador .valor{font-weight:900; color:#fff; font-size:clamp(46px,5.4vw,72px);}
+.indicador .valor span{color:var(--dourado);}
+.indicador .rotulo-i{font-family:var(--corpo); font-weight:700; font-size:11px; letter-spacing:.22em; border-top-color:rgba(201,162,75,.35);}
+
+.ultimas{margin-top:clamp(44px,6vh,70px);}
+.ultimas h2{display:flex; align-items:center; gap:18px; margin:0 0 22px;
+  font-family:var(--corpo); font-weight:800; font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:var(--dourado);}
+.ultimas h2::after{content:""; flex:1; height:2px; background:linear-gradient(90deg,var(--dourado),transparent);}
+.ultimas ul{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+.ult{border:1px solid var(--borda-ouro); border-radius:14px; overflow:hidden; background:var(--cartao);
+  box-shadow:0 14px 30px rgba(0,0,0,.35); transition:transform .5s var(--lento);}
+.ult:hover{transform:translateY(-6px);}
+.ult .ft{aspect-ratio:4/3; background:#0a2219 center/cover; position:relative;}
+.ult .ft.sem{display:grid; place-items:center;}
+.ult .ft.sem img{width:38%; opacity:.5;}
+.ult .dt{position:absolute; left:12px; top:12px; padding:5px 11px; background:var(--faixa-ouro); color:#0E2E22;
+  font:800 10px var(--corpo); letter-spacing:.14em; text-transform:uppercase; border-radius:3px;}
+.ult .tx{padding:14px 16px 16px;}
+.ult b{display:block; font:700 15px/1.3 var(--corpo); color:#fff;}
+.ult span{display:block; margin-top:6px; font:500 12.5px/1.4 var(--corpo); color:var(--champanhe); opacity:.85;}
+
+/* ── Menu em cartões ── */
+.cartoes-nav{gap:18px; background:none; border:0;}
+.cartao-nav{border:1px solid var(--borda-ouro); border-radius:14px; background:var(--cartao);
+  box-shadow:0 14px 30px rgba(0,0,0,.3);}
+.cartao-nav:hover{background:linear-gradient(180deg,rgba(31,96,72,.6),rgba(14,46,34,.85));}
+.cartao-num{font-family:var(--corpo); font-weight:800;}
+.cartao-titulo{font-weight:800; color:#fff; font-size:19px;}
+.cartao-resumo{font-family:var(--corpo); font-style:normal; font-size:14.5px; opacity:.85;}
+
+/* ── 03 · Mapa ── */
+.quadro{border-radius:16px; border-color:var(--borda-ouro); background:rgba(6,24,16,.45);}
+.hud .km{font-weight:900;}
+.faixa .sede{font-weight:700;}
+.faixa .cidade{font-family:var(--corpo);}
+
+/* ── 04 · Jornada: cartões, fotos coloridas, linha de percurso ── */
+.pilula{font-family:var(--corpo); font-weight:700; border-radius:40px; border-color:var(--borda-ouro);}
+.capa-mes{border-bottom:0; padding:22px 26px; margin-bottom:6px; border:1px solid var(--borda-ouro); border-radius:14px;
+  background:var(--cartao); position:relative; overflow:hidden;}
+.capa-mes::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--faixa-ouro);}
+.capa-mes .nome-mes{font-weight:900; color:#fff; letter-spacing:.14em;}
+.capa-mes .saldo-mes{font-family:var(--corpo); font-style:normal; font-size:15px;}
+.dia{border-left:2px dashed rgba(201,162,75,.45);}
+.dia::before{width:12px; height:12px; left:-7px; background:var(--ouro-grad); box-shadow:0 0 0 5px #0B271C;}
+.dia-data{display:inline-block; padding:5px 12px; background:var(--faixa-ouro); color:#0E2E22;
+  font-family:var(--corpo); font-weight:800; font-size:11px; letter-spacing:.14em; border-radius:3px;}
+.dia-km{font-family:var(--corpo); font-weight:700;}
+.dia-percurso{font-family:var(--corpo); font-size:14px;}
+.eventos{gap:14px; background:none; border:0;}
+.evento{border:1px solid var(--borda-ouro); border-radius:14px; background:var(--cartao);
+  box-shadow:0 12px 28px rgba(0,0,0,.3); display:grid; grid-template-columns:44px 1fr; gap:18px;}
+.evento:hover{background:linear-gradient(180deg,rgba(31,96,72,.55),rgba(14,46,34,.85));}
+.evento .selo{width:44px; opacity:.95;}
+.evento h3{font-family:'Cinzel',serif; font-weight:700; font-size:21px; color:#fff; letter-spacing:.01em;}
+.evento .sede-ev{font-family:var(--corpo); font-weight:700; letter-spacing:.06em;}
+.evento .cidade-ev{font-family:var(--corpo);}
+.evento .fotos img, .visita .fotos img{filter:none; border:2px solid var(--borda-ouro); border-radius:10px;
+  max-height:340px; box-shadow:0 12px 26px rgba(0,0,0,.4);}
+.marca-partilha{font-family:var(--corpo); font-style:normal; font-size:13px;}
+
+/* ── Territórios e regiões ── */
+.macros{gap:14px; background:none; border:0;}
+.macro{border:1px solid rgba(201,162,75,.3); border-radius:14px; background:var(--cartao);}
+.macro.acesa{border-color:var(--borda-ouro); box-shadow:0 12px 28px rgba(0,0,0,.3);}
+.macro .letra{font-weight:900;}
+.macro .regioes{font-family:var(--corpo);}
+.regioes-cartoes, .visitas{gap:14px; background:none; border:0;}
+.regiao-cartao, .visita{border:1px solid var(--borda-ouro); border-radius:14px; background:var(--cartao);}
+.regiao-nome{font-weight:800;}
+.v-evento{font-family:'Cinzel',serif; font-weight:700; color:#fff;}
+
+/* ── 05 · Fototeca ── */
+.revelacao, .legenda-peca{background:#FBF7EC;}
+.legenda-peca .p-evento{font-family:'Cinzel',serif; font-weight:700;}
+.legenda-peca .p-cidade{font-family:var(--corpo);}
+
+@media (max-width:900px){ .ultimas ul{grid-template-columns:repeat(2,1fr);} }
+
+/* Celular: o mapa é o protagonista; contador, evento e legenda ficam compactos
+   numa faixa só, e a esteira de sedes sai (ela já está na Jornada). */
+@media (max-width:820px){
+  .quadro{border:0; background:none; display:flex; flex-direction:column; justify-content:center;}
+  .mapa-svg{width:100%; margin:0; padding:0 6px;}
+  .hud{display:grid; grid-template-columns:auto 1fr; gap:4px 16px; align-items:center; text-align:left;
+    margin:10px 16px 0; padding:12px 14px; border:1px solid var(--borda-ouro); border-radius:12px; background:rgba(6,24,16,.7);}
+  .hud .rotulo{display:none;}
+  .hud .km{font-size:34px; grid-row:1 / span 2;}
+  .hud .km-rot{font-size:8px; letter-spacing:.2em; margin:0; padding:0; border:0; grid-column:1; grid-row:3;}
+  .marco{grid-column:2; grid-row:1 / span 3; margin:0; min-height:0;}
+  .marco .quando{font-size:8.5px; letter-spacing:.14em;}
+  .marco .oque{font-size:14px; margin-top:3px; line-height:1.3;}
+  .marco .onde{font-size:11.5px; margin-top:2px;}
+  .legenda{margin-top:10px; gap:4px 14px;}
+  .legenda li{font-size:11px;}
+  .legenda i{width:9px; height:9px; flex-basis:9px;}
+  .faixa{display:none;}
+}
+#ultimas-visitas{padding-top:clamp(30px,5vh,56px); padding-bottom:clamp(30px,5vh,56px);}
+#ultimas-visitas .ultimas{margin-top:0;}
+/* Celular: últimas visitas em 2 fileiras de 2, cartões compactos */
+@media (max-width:820px){
+  #ultimas-visitas{padding-top:40px; padding-bottom:40px;}
+  .ultimas{margin-top:0;}
+  .ultimas ul{grid-template-columns:repeat(2,1fr); gap:10px;}
+  .ult .tx{padding:9px 10px 11px;}
+  .ult b{font-size:12.5px;}
+  .ult span{font-size:10.5px; margin-top:4px;}
+  .ult .dt{left:7px; top:7px; padding:3px 7px; font-size:8.5px;}
+}
+@media print{ .mosaico, .ultimas, .km-quadro{box-shadow:none;} .mosaico{display:none;} .titulo-capitulo::before{display:none;} }

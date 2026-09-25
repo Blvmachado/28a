@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Região Administrativa — MCR 28ª Região</title>
+<meta name="description" content="Visitas oficiais e registro fotográfico do Mestre Conselheiro Regional da 28ª Região Administrativa em cada Região Administrativa do Estado de São Paulo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;800;900&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css?v=2026-09-25f">
+<link rel="stylesheet" href="estilo-v2.css?v=2026-09-25f">
+</head>
+<body>
+
+<main>
+  <section class="capitulo" id="regiao">
+    <a class="voltar" href="alcance.html">← Alcance da gestão</a>
+    <div data-conteudo></div>
+  </section>
+
+  <section class="capitulo" id="rodape" data-rodape></section>
+</main>
+
+<script src="dados.js?v=2026-09-25f"></script>
+<script src="comum.js?v=2026-09-25f"></script>
+<script>
+montarMoldura('territorio');
+
+/* Uma página só serve todas as regiões: o número vem do endereço.
+   Região nova acende sozinha, sem criar arquivo. */
+const ra = Number(new URLSearchParams(location.search).get('ra'));
+const alvo = document.querySelector('[data-conteudo]');
+const visitas = EVENTOS.filter(e => e.ra === ra)
+                       .sort((a, b) => a.data.localeCompare(b.data));
+
+function macroDa(ra){
+  return Object.keys(MACROS).find(g => MACROS[g].includes(ra));
+}
+
+if (!ra || !visitas.length){
+  /* Endereço inválido ou região sem visita: dizer o que houve, e oferecer
+     saída. Uma página em branco faria o leitor achar que o site quebrou. */
+  alvo.innerHTML =
+    '<p class="capitulo-num">03 &nbsp;·&nbsp; O Território</p>' +
+    '<h1 class="titulo-capitulo">Nenhuma visita registrada</h1>' +
+    '<p class="nota">' + (ra
+      ? 'A ' + ra + 'ª Região Administrativa ainda não recebeu visita nesta gestão.'
+      : 'O endereço não indica qual Região Administrativa mostrar.') +
+    '</p>' +
+    '<p class="nota"><a class="ligacao" href="alcance.html">Ver as regiões alcançadas →</a></p>';
+} else {
+  document.title = ra + 'ª Região Administrativa — MCR 28ª Região';
+
+  const km = visitas.reduce((t, e) => t + e.km, 0);
+  const cidades = [...new Set(visitas.map(e => e.cidade))];
+  // Evento sem organização vinculada não entra na contagem de sedes.
+  const sedes = [...new Set(visitas.filter(e => e.sede).map(e => e.sede))];
+  const macro = macroDa(ra);
+  const propria = ra === 28;
+  const comFoto = visitas.filter(e => e.fotos && e.fotos.length).length;
+
+  const resumo = [
+    { valor: visitas.length, rotulo: visitas.length > 1 ? 'visitas' : 'visita' },
+    { valor: sedes.length,   rotulo: sedes.length > 1 ? 'sedes distintas' : 'sede' },
+    { valor: cidades.length, rotulo: cidades.length > 1 ? 'cidades' : 'cidade' },
+    // Região alcançada no meio de uma viagem contínua: o km foi lançado
+    // no primeiro dia, em outra região. "0 km" leria como se não houvesse
+    // estrada; o indicador aponta a viagem.
+    (km === 0 && visitas.some(e => e.viagem))
+      ? { valor: '—', rotulo: 'km na viagem de ' + escapar(visitas.find(e => e.viagem).viagem) }
+      : { valor: nf.format(km) + ' <span style="opacity:.55">km</span>',
+          rotulo: 'em deslocamentos' }
+  ];
+
+  const lista = visitas.map(e => {
+    const fotos = blocoFotos(e);
+    return '<li class="visita">' +
+      '<span class="v-data">' + escapar(e.rotulo || porExtenso(e.data)) + '</span>' +
+      '<p class="v-evento">' + escapar(e.evento) + '</p>' +
+      (e.sede ? '<p class="v-sede">' + escapar(e.sede) + '</p>' : '') +
+      '<p class="v-meta">' + escapar(e.cidade) + '/' + uf(e) + ' · ' + escapar(e.percurso) +
+        (e.km ? ' · ' + nf.format(e.km) + ' km' : '') + '</p>' +
+      (e.conta ? '' :
+        '<span class="v-naoconta">Não conta para a contagem de regiões</span>') +
+      fotos +
+    '</li>';
+  }).join('');
+
+  alvo.innerHTML =
+    '<p class="capitulo-num">03 &nbsp;·&nbsp; ' + (propria ? 'A própria região' : 'Macrorregião ' + macro) + '</p>' +
+    '<h1 class="titulo-capitulo">' + ra + 'ª Região Administrativa</h1>' +
+    '<p class="nota">' + escapar(cidades.join(' · ')) + '</p>' +
+    (comFoto ? '<p class="nota"><a class="ligacao" href="fototeca.html?ra=' + ra +
+      '">Ver as fotos desta região →</a></p>' : '') +
+    '<div class="painel" data-painel-regiao>' +
+      resumo.map(i => '<div class="indicador visivel">' +
+        '<b class="valor">' + i.valor + '</b>' +
+        '<span class="rotulo-i">' + i.rotulo + '</span></div>').join('') +
+    '</div>' +
+    (comFoto ? '' :
+      '<p class="nota">O registro fotográfico desta região entra à medida que as ' +
+      'imagens das cerimônias forem reunidas.</p>') +
+    '<ul class="visitas">' + lista + '</ul>';
+}
+
+montarRodape(document.querySelector('[data-rodape]'));
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Território — MCR 28ª Região Administrativa</title>
+<meta name="description" content="As macrorregiões e as Regiões Administrativas do Estado de São Paulo onde a 28ª Região esteve presente na gestão 2026/2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;800;900&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css?v=2026-09-25f">
+<link rel="stylesheet" href="estilo-v2.css?v=2026-09-25f">
+</head>
+<body>
+
+<main>
+  <section class="capitulo" id="territorio">
+    <p class="nota" data-nota-macros></p>
+    <ul class="macros" data-macros></ul>
+    <div class="detalhe" data-detalhe aria-live="polite"></div>
+  </section>
+
+  <section class="capitulo" id="rodape" data-rodape></section>
+</main>
+
+<script src="dados.js?v=2026-09-25f"></script>
+<script src="comum.js?v=2026-09-25f"></script>
+<script>
+montarMoldura('territorio');
+
+document.getElementById('territorio').insertAdjacentHTML('afterbegin',
+  abreCapitulo('territorio',
+    DIAG.macros + ' de ' + DIAG.macrosTotal + ' macrorregiões alcançadas, ' +
+    'reunindo ' + DIAG.regioesVisitadas.length +
+    ' Regiões Administrativas do Estado de São Paulo.'));
+
+document.querySelector('[data-nota-macros]').textContent =
+  'O Estado de São Paulo se organiza em ' + DIAG.macrosTotal +
+  ' macrorregiões, que reúnem as ' +
+  Object.values(MACROS).reduce((t, g) => t + g.length, 0) +
+  ' Regiões Administrativas. Abra uma macrorregião alcançada para ver onde a 28ª esteve.';
+
+const listaMacros = document.querySelector('[data-macros]');
+const detalheEl = document.querySelector('[data-detalhe]');
+
+/* Só as macrorregiões alcançadas viram botão: clicar numa que não foi
+   visitada não teria o que abrir, e um botão que não faz nada é pior
+   que nenhum botão. */
+listaMacros.innerHTML = Object.keys(MACROS).map(g => {
+  const acesa = DIAG.macrosAcesas.includes(g);
+  const regioes = MACROS[g].map(r => r + 'ª').join(' · ');
+  const visitadas = MACROS[g].filter(r => DIAG.regioesVisitadas.includes(r));
+  const miolo =
+    '<b class="letra">' + g + '</b>' +
+    '<p class="regioes">' + regioes + ' Região</p>' +
+    '<p class="estado">' + (acesa
+       ? 'Alcançada — ' + visitadas.map(r => r + 'ª').join(', ')
+       : 'Ainda não alcançada') + '</p>' +
+    (acesa ? '<span class="abrir">Ver regiões →</span>' : '');
+  return '<li>' + (acesa
+    ? '<button class="macro acesa" data-macro data-g="' + g +
+      '" aria-expanded="false" aria-controls="detalhe-territorio">' + miolo + '</button>'
+    : '<div class="macro" data-macro>' + miolo + '</div>') + '</li>';
+}).join('');
+
+let macroAberta = null;
+
+function visitasDaRegiao(ra){
+  return EVENTOS.filter(e => e.ra === ra);
+}
+
+function desenharDetalhe(){
+  if (!macroAberta){ detalheEl.innerHTML = ''; return; }
+  const visitadas = MACROS[macroAberta].filter(r => DIAG.regioesVisitadas.includes(r));
+
+  /* Cada região é um link de verdade, não um painel que abre: a página
+     da região tem endereço próprio e pode ser compartilhada sozinha. */
+  const links = visitadas.map(ra => {
+    const lista = visitasDaRegiao(ra);
+    const km = lista.reduce((t, e) => t + e.km, 0);
+    const cidades = [...new Set(lista.map(e => e.cidade))];
+    return '<li><a class="regiao-cartao" href="regiao.html?ra=' + ra + '">' +
+             '<span class="regiao-nome">' + ra + 'ª Região Administrativa</span>' +
+             '<span class="regiao-meta">' + lista.length +
+               (lista.length > 1 ? ' visitas' : ' visita') +
+               ' · ' + cidades.length + (cidades.length > 1 ? ' cidades' : ' cidade') +
+               (km ? ' · ' + nf.format(km) + ' km' : '') + '</span>' +
+             '<span class="regiao-cidades">' + escapar(cidades.join(' · ')) + '</span>' +
+             '<span class="cartao-seta">→</span>' +
+           '</a></li>';
+  }).join('');
+
+  /* O painel abre DENTRO da grade, logo abaixo da linha da caixa clicada
+     (ocupando a largura toda), em vez de ir para o fim da lista. */
+  const linha = document.createElement('li');
+  linha.className = 'detalhe-linha';
+  linha.style.gridColumn = '1 / -1';
+  linha.innerHTML =
+    '<div class="painel-detalhe" id="detalhe-territorio">' +
+      '<p class="detalhe-titulo">Macrorregião ' + macroAberta + '</p>' +
+      '<p class="detalhe-sub">Escolha uma Região Administrativa para ver as visitas e o registro fotográfico</p>' +
+      '<ul class="regioes-cartoes">' + links + '</ul>' +
+    '</div>';
+  const itens = [...listaMacros.children].filter(li => !li.classList.contains('detalhe-linha'));
+  const idx = itens.findIndex(li => li.querySelector('[data-g="' + macroAberta + '"]'));
+  const colunas = getComputedStyle(listaMacros).gridTemplateColumns.split(' ').length || 1;
+  const fimDaLinha = Math.min(itens.length - 1, Math.floor(idx / colunas) * colunas + colunas - 1);
+  itens[fimDaLinha].after(linha);
+  linha.scrollIntoView({ behavior: calmo ? 'auto' : 'smooth', block: 'nearest' });
+}
+
+listaMacros.addEventListener('click', e => {
+  const b = e.target.closest('button.macro');
+  if (!b) return;
+  const g = b.dataset.g;
+  macroAberta = (macroAberta === g) ? null : g;   // clicar de novo fecha
+  listaMacros.querySelectorAll('button.macro').forEach(x =>
+    x.setAttribute('aria-expanded', String(x.dataset.g === macroAberta)));
+  listaMacros.querySelectorAll('.detalhe-linha').forEach(li => li.remove());
+  desenharDetalhe();
+});
+
+montarRodape(document.querySelector('[data-rodape]'));
+revelar('[data-macro]');
+</script>
+</body>
+</html>
