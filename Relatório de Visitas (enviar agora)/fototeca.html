@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fototeca — MCR 28ª Região Administrativa</title>
+<meta name="description" content="O mural fotográfico da gestão 2026/2027 do Mestre Conselheiro Regional da 28ª Região Administrativa do Estado de São Paulo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;800;900&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css?v=2026-09-27a">
+<link rel="stylesheet" href="estilo-v2.css?v=2026-09-27a">
+</head>
+<body>
+
+<main>
+  <section class="capitulo" id="fototeca">
+    <div data-conteudo></div>
+  </section>
+
+  <section class="capitulo" id="rodape" data-rodape></section>
+</main>
+
+<script src="dados.js?v=2026-09-27a"></script>
+<script src="comum.js?v=2026-09-27a"></script>
+<script>
+montarMoldura('fototeca');
+
+const cronologia = [...EVENTOS].sort((a, b) => a.data.localeCompare(b.data));
+const comFoto = cronologia.filter(e => e.fotos && e.fotos.length);
+const semFoto = cronologia.filter(e => !e.fotos || !e.fotos.length);
+const alvo = document.querySelector('[data-conteudo]');
+
+/* Cada FOTOGRAFIA é uma peça do mural — não cada evento. Um evento com
+   quatro fotos entra como quatro peças, que é o que faz uma colagem
+   parecer colagem em vez de uma grade de fichas. */
+/* Filtros vindos dos links "+N fotos" (?evento=) e da página da região
+   (?ra=): mostram só aquele compilado, com saída para o mural inteiro. */
+const params = new URLSearchParams(location.search);
+const filtroEvento = params.get('evento');
+const filtroRa = params.get('ra') ? Number(params.get('ra')) : null;
+const filtrados = comFoto.filter(e =>
+  (!filtroEvento || chaveEvento(e) === filtroEvento) &&
+  (!filtroRa || e.ra === filtroRa));
+const filtrando = !!(filtroEvento || filtroRa) && filtrados.length > 0;
+const base = filtrando ? filtrados : comFoto;
+
+const pecas = [];
+base.forEach(e => (e.fotos || []).forEach(f => pecas.push({ e:e, f:f })));
+
+let subtitulo;
+if (filtrando && filtroEvento){
+  const e = filtrados[0];
+  subtitulo = escapar(e.evento) + (e.sede ? ' · ' + escapar(e.sede) : '') + ' · ' +
+    escapar(e.rotulo || porExtenso(e.data)) + ' — ' + pecas.length +
+    (pecas.length > 1 ? ' fotografias.' : ' fotografia.');
+} else if (filtrando){
+  subtitulo = filtroRa + 'ª Região Administrativa — ' + pecas.length +
+    (pecas.length > 1 ? ' fotografias' : ' fotografia') + ' de ' + filtrados.length +
+    (filtrados.length > 1 ? ' cerimônias.' : ' cerimônia.');
+} else {
+  subtitulo = pecas.length
+    ? pecas.length + (pecas.length > 1 ? ' fotografias' : ' fotografia') +
+      ' de ' + comFoto.length +
+      (comFoto.length > 1 ? ' cerimônias' : ' cerimônia') + ' da gestão.'
+    : 'O mural da gestão, ainda em branco — cada cerimônia reservando o seu lugar.';
+}
+document.getElementById('fototeca').insertAdjacentHTML('afterbegin',
+  abreCapitulo('fototeca', subtitulo) +
+  (filtrando ? '<a class="voltar" href="fototeca.html">← Ver toda a fototeca</a>' : ''));
+
+function peca(p){
+  const e = p.e, f = p.f;
+  return '<li class="peca' + (f.capa ? ' capa' : '') + '" data-peca>' +
+    '<figure class="revelacao">' +
+      '<img src="' + escapar(f.arquivo) + '" alt="' +
+        escapar(f.legenda || e.evento) + '" loading="lazy" decoding="async">' +
+      '<figcaption class="legenda-peca">' +
+        '<span class="p-data">' + escapar(e.rotulo || porExtenso(e.data)) + '</span>' +
+        '<span class="p-evento">' + escapar(f.legenda || e.evento) + '</span>' +
+        (e.sede ? '<span class="p-sede">' + escapar(e.sede) + '</span>' : '') +
+        '<span class="p-cidade">' + escapar(e.cidade) + ' / ' + uf(e) + '</span>' +
+      '</figcaption>' +
+    '</figure>' +
+  '</li>';
+}
+
+/* Cerimônias sem foto entram numa lista discreta, nunca como peças
+   vazias: um mural de espaços reservados não é uma colagem. */
+function pendentes(lista){
+  if (!lista.length) return '';
+  return '<section class="aguardando">' +
+    '<h2>' + lista.length +
+      (lista.length > 1 ? ' cerimônias aguardando registro' : ' cerimônia aguardando registro') +
+    '</h2><ul>' + lista.map(e =>
+      '<li><b>' + escapar(e.rotulo || porExtenso(e.data)) + '</b>' +
+        escapar(e.evento) +
+        (e.sede ? ' · ' + escapar(e.sede) : '') + ' · ' +
+        escapar(e.cidade) + '/' + uf(e) + '</li>').join('') +
+    '</ul></section>';
+}
+
+if (!pecas.length){
+  /* Sem nenhuma fotografia, o capítulo assume o estado em vez de
+     simular um mural. */
+  alvo.innerHTML =
+    '<div class="mural-vazio">' +
+      '<div class="selo-grande">' + SELO + '</div>' +
+      '<p>As fotografias das cerimônias vão compor este mural ao longo ' +
+        'da gestão. Até lá, o registro está guardado nas páginas.</p>' +
+    '</div>' + pendentes(semFoto);
+} else {
+  alvo.innerHTML =
+    '<ul class="mural">' + pecas.map(peca).join('') + '</ul>' +
+    (filtrando ? '' : pendentes(semFoto));
+}
+
+montarRodape(document.querySelector('[data-rodape]'));
+revelar('[data-peca]');
+</script>
+</body>
+</html>

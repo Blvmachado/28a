@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Jornada — MCR 28ª Região Administrativa</title>
+<meta name="description" content="Cada visita oficial do Mestre Conselheiro Regional da 28ª Região Administrativa, em ordem cronológica, com sede, percurso e quilometragem.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;800;900&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css?v=2026-09-27a">
+<link rel="stylesheet" href="estilo-v2.css?v=2026-09-27a">
+</head>
+<body>
+
+<main>
+  <section class="capitulo" id="timeline">
+    <ul class="pilulas" data-pilulas role="tablist" aria-label="Filtrar por mês"></ul>
+    <div data-meses></div>
+  </section>
+
+  <section class="capitulo" id="rodape" data-rodape></section>
+</main>
+
+<script src="dados.js?v=2026-09-27a"></script>
+<script src="comum.js?v=2026-09-27a"></script>
+<script src="meses.js?v=2026-09-27a"></script>
+<script>
+montarMoldura('jornada');
+
+document.getElementById('timeline').insertAdjacentHTML('afterbegin',
+  abreCapitulo('jornada',
+    DIAG.eventos + ' visitas oficiais em ' + DIAG.dias +
+    ' dias de estrada, na ordem em que aconteceram.'));
+
+const mesesPresentes = [...new Set(EVENTOS.map(e => e.data.slice(0, 7)))].sort();
+const anosDistintos = new Set(mesesPresentes.map(c => c.slice(0, 4))).size;
+const recipiente = document.querySelector('[data-meses]');
+const pilulasEl = document.querySelector('[data-pilulas]');
+
+function rotuloMes(chave){
+  const [ano, mes] = chave.split('-');
+  const nome = MESES[Number(mes) - 1];
+  // O mandato atravessa dois anos: havendo mais de um, o mês precisa
+  // dizer de qual ano está falando.
+  return nome[0].toUpperCase() + nome.slice(1) +
+         (anosDistintos > 1 ? ' ' + ano.slice(2) : '');
+}
+
+mesesPresentes.forEach(chave => {
+  const bloco = document.createElement('div');
+  bloco.className = 'mes-bloco';
+  bloco.dataset.mes = chave;
+  recipiente.appendChild(bloco);
+  montarMes(bloco);
+});
+
+/* Filtro por mês. "Todos" é o padrão: a vitrine é para quem chega de
+   fora e precisa ver a gestão inteira sem descobrir um controle. */
+const FILTROS = [{ chave:'todos', rotulo:'Todos' }]
+  .concat(mesesPresentes.map(c => ({ chave:c, rotulo:rotuloMes(c) })));
+
+pilulasEl.innerHTML = FILTROS.map(f =>
+  '<li role="presentation"><button class="pilula" role="tab" data-filtro="' + f.chave +
+  '" aria-selected="false">' + f.rotulo + '</button></li>').join('');
+
+function filtrar(chave){
+  pilulasEl.querySelectorAll('[data-filtro]').forEach(b =>
+    b.setAttribute('aria-selected', String(b.dataset.filtro === chave)));
+  recipiente.querySelectorAll('.mes-bloco').forEach(b =>
+    b.classList.toggle('oculto', chave !== 'todos' && b.dataset.mes !== chave));
+}
+pilulasEl.addEventListener('click', e => {
+  const b = e.target.closest('[data-filtro]');
+  if (b) filtrar(b.dataset.filtro);
+});
+filtrar('todos');
+
+montarRodape(document.querySelector('[data-rodape]'));
+revelar('[data-dia]');
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registros — MCR 28ª Região Administrativa</title>
+<meta name="description" content="Presenças do Mestre Conselheiro Regional da 28ª Região Administrativa em cerimônias das demais Ordens paramaçônicas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;800;900&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css?v=2026-09-27a">
+<link rel="stylesheet" href="estilo-v2.css?v=2026-09-27a">
+</head>
+<body>
+
+<main>
+  <section class="capitulo" id="paramaconicas">
+    <p class="nota">
+      Presenças em cerimônias das demais Ordens paramaçônicas. Estas visitas
+      <b>não entram na contagem de Regiões Administrativas</b> — o critério exige
+      evento da própria Ordem DeMolay — mas fazem parte do mandato e do
+      relacionamento entre as Ordens.
+    </p>
+    <div data-conteudo></div>
+  </section>
+
+  <section class="capitulo" id="rodape" data-rodape></section>
+</main>
+
+<script src="dados.js?v=2026-09-27a"></script>
+<script src="comum.js?v=2026-09-27a"></script>
+<script>
+montarMoldura('registros');
+
+const deOutras = EVENTOS.filter(e => e.ordem !== 'DeMolay')
+                        .sort((a, b) => a.data.localeCompare(b.data));
+const alvo = document.querySelector('[data-conteudo]');
+
+/* Agrupado por Ordem, não por data: quem abre esta página quer saber
+   com quais Ordens houve convivência, e só depois quando. */
+const porOrdem = new Map();
+deOutras.forEach(e => {
+  if (!porOrdem.has(e.ordem)) porOrdem.set(e.ordem, []);
+  porOrdem.get(e.ordem).push(e);
+});
+
+document.getElementById('paramaconicas').insertAdjacentHTML('afterbegin',
+  abreCapitulo('registros', deOutras.length
+    ? deOutras.length + (deOutras.length > 1 ? ' presenças' : ' presença') +
+      ' em ' + porOrdem.size +
+      (porOrdem.size > 1 ? ' Ordens paramaçônicas' : ' Ordem paramaçônica') +
+      ', fora da Ordem DeMolay.'
+    : 'As presenças em cerimônias de outras Ordens aparecerão aqui.'));
+
+if (!deOutras.length){
+  alvo.innerHTML =
+    '<p class="nota">As presenças em cerimônias de outras Ordens aparecerão aqui ' +
+    'conforme forem registradas.</p>';
+} else {
+  alvo.innerHTML = [...porOrdem.entries()].map(([ordem, lista]) => {
+    const km = lista.reduce((t, e) => t + e.km, 0);
+    const cidades = [...new Set(lista.map(e => e.cidade))];
+    const itens = lista.map(e =>
+      '<li class="visita">' +
+        '<span class="v-data">' + escapar(e.rotulo || porExtenso(e.data)) + '</span>' +
+        '<p class="v-evento">' + escapar(e.evento) + '</p>' +
+        (e.sede ? '<p class="v-sede">' + escapar(e.sede) + '</p>' : '') +
+        '<p class="v-meta">' + escapar(e.cidade) + '/' + uf(e) + ' · ' + escapar(e.percurso) +
+          (e.km ? ' · ' + nf.format(e.km) + ' km' : '') + '</p>' +
+        blocoFotos(e) +
+      '</li>').join('');
+    return '<div class="grupo-ordem">' +
+      '<div class="capa-mes">' +
+        '<p class="nome-mes">' + escapar(ordem) + '</p>' +
+        '<p class="saldo-mes"><b>' + lista.length +
+          (lista.length > 1 ? ' presenças' : ' presença') + '</b> em ' +
+          escapar(cidades.join(' · ')) +
+          (km ? ' · ' + nf.format(km) + ' km' : '') + '</p>' +
+      '</div>' +
+      '<ul class="visitas">' + itens + '</ul>' +
+    '</div>';
+  }).join('');
+}
+
+montarRodape(document.querySelector('[data-rodape]'));
+</script>
+</body>
+</html>
